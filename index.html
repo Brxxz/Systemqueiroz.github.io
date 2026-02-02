@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>BRXQUEIROZ | CYBER SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#020409;
+--neon:#00f5d4;
+--purple:#7c7cff;
+--red:#ff3b3b;
+--text:#e5e7eb;
+--muted:#9ca3af;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+
+body{
+background:radial-gradient(circle at top,#0b1225,var(--bg));
+color:var(--text);
+overflow-x:hidden;
+}
+
+/* BACKGROUND */
+canvas.bg{position:fixed;inset:0;z-index:-3}
+.scanlines{
+position:fixed;inset:0;
+background:repeating-linear-gradient(
+to bottom,
+rgba(255,255,255,.03),
+rgba(255,255,255,.03) 1px,
+transparent 2px,
+transparent 4px
+);
+pointer-events:none;
+z-index:5;
+}
+.cursor{
+position:fixed;
+width:22px;height:22px;
+border-radius:50%;
+background:rgba(0,245,212,.6);
+filter:blur(12px);
+pointer-events:none;
+z-index:999;
+}
+
+/* LOGIN */
+#login{
+position:fixed;
+inset:0;
+background:black;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+#login button{
+background:var(--neon);
+border:none;
+padding:18px 45px;
+font-size:1rem;
+font-weight:900;
+cursor:pointer;
+box-shadow:0 0 40px var(--neon);
+}
+
+/* NAV */
+nav{
+position:fixed;
+top:0;width:100%;
+padding:20px 60px;
+display:flex;
+justify-content:space-between;
+backdrop-filter:blur(12px);
+background:rgba(2,4,9,.85);
+z-index:10;
+}
+nav h1{
+font-weight:900;
+background:linear-gradient(90deg,var(--neon),var(--purple));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+nav a{
+margin-left:25px;
+font-size:.85rem;
+color:var(--muted);
+cursor:pointer;
+transition:.25s;
+}
+nav a:hover{color:var(--neon);text-shadow:0 0 12px var(--neon)}
+
+/* PAGES */
+.page{
+min-height:100vh;
+padding:140px 80px;
+display:none;
+}
+.page.active{display:block}
+.container{max-width:1200px;margin:auto}
+
+/* GLITCH */
+.glitch{
+font-size:4.8rem;
+font-weight:900;
+position:relative;
+}
+.glitch::before,.glitch::after{
+content:attr(data-text);
+position:absolute;left:0;width:100%;
+}
+.glitch::before{top:-2px;color:var(--neon);animation:g1 2s infinite}
+.glitch::after{top:2px;color:var(--purple);animation:g2 1.5s infinite}
+@keyframes g1{0%{clip-path:inset(10% 0 60% 0)}50%{clip-path:inset(40% 0 20% 0)}}
+@keyframes g2{0%{clip-path:inset(50% 0 10% 0)}50%{clip-path:inset(20% 0 40% 0)}}
+
+/* CARDS */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:30px;
+margin-top:40px;
+}
+.card{
+background:#01040a;
+border:1px solid rgba(0,245,212,.35);
+border-radius:16px;
+padding:25px;
+box-shadow:0 0 60px rgba(0,245,212,.25);
+transition:.35s;
+}
+.card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 140px rgba(0,245,212,.45);
+}
+.card h3{color:var(--neon);margin-bottom:10px}
+
+/* TERMINAL */
+.terminal{
+background:black;
+border:1px solid rgba(0,245,212,.4);
+border-radius:16px;
+padding:25px;
+box-shadow:0 0 90px rgba(0,245,212,.5);
+}
+.output{max-height:340px;overflow-y:auto;font-family:monospace}
+.output p{color:var(--neon);margin-bottom:6px}
+.terminal input{
+width:100%;
+background:black;
+border:none;
+color:var(--neon);
+padding:10px;
+font-family:monospace;
+}
+
+/* MAP */
+#map{
+width:100%;
+height:450px;
+border-radius:16px;
+border:1px solid rgba(0,245,212,.4);
+background:black;
+}
+
+/* FOOTER */
+footer{text-align:center;padding:40px;font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+
+<body>
+
+<!-- AUDIO -->
+<audio id="click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+<audio id="loginSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="ambient" src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3" loop></audio>
+
+<!-- LOGIN -->
+<div id="login">
+<button onclick="enter()">ACCESS SYSTEM</button>
+</div>
+
+<canvas class="bg" id="matrix"></canvas>
+<div class="scanlines"></div>
+<div class="cursor" id="cursor"></div>
+
+<nav>
+<h1>BRX SYSTEM</h1>
+<div>
+<a onclick="go('home')">Home</a>
+<a onclick="go('tech')">Tech</a>
+<a onclick="go('projects')">Projects</a>
+<a onclick="go('terminal')">Terminal</a>
+<a onclick="go('mapPage')">World Map</a>
+<a onclick="go('music')">Music</a>
+</div>
+</nav>
+
+<section id="home" class="page active">
+<div class="container">
+<div class="glitch" data-text="BrxQueiroz">BrxQueiroz</div>
+<p style="margin-top:25px;max-width:760px;color:var(--muted)">
+Cybersecurity & Systems Engineering.<br>
+Portfólio interativo focado em arquitetura, segurança por design e engenharia de software.
+</p>
+<img src="https://i.imgur.com/9QF1M5C.png" style="margin-top:40px;width:100%;border-radius:16px">
+</div>
+</section>
+
+<section id="tech" class="page">
+<div class="container">
+<h2 style="color:var(--neon)">Programming & Engineering</h2>
+<div class="grid">
+<div class="card"><h3>Stack</h3><p>JavaScript • HTML • CSS<br>Lógica sólida • Estruturação</p></div>
+<div class="card"><h3>Mindset</h3><p>Clean Code • Segurança por design<br>Pensamento sistêmico</p></div>
+<div class="card"><h3>Arquitetura</h3><p>Separação de responsabilidades<br>Resiliência e escalabilidade</p></div>
+</div>
+</div>
+</section>
+
+<section id="projects" class="page">
+<div class="container">
+<h2 style="color:var(--neon)">Selected Projects</h2>
+<div class="grid">
+<div class="card"><h3>Cyber War Room</h3><p>Monitoramento e defesa simulada</p></div>
+<div class="card"><h3>Secure Dashboards</h3><p>Interfaces administrativas seguras</p></div>
+<div class="card"><h3>Threat Visualizer</h3><p>Eventos e ataques em tempo real</p></div>
+</div>
+</div>
+</section>
+
+<section id="terminal" class="page">
+<div class="container terminal">
+<div class="output" id="out">
+<p>> system online</p>
+<p>> type help</p>
+</div>
+<input id="cmd" placeholder="command">
+</div>
+</section>
+
+<section id="mapPage" class="page">
+<div class="container">
+<h2 style="color:var(--neon)">Global Threat Activity</h2>
+<canvas id="map"></canvas>
+</div>
+</section>
+
+<section id="music" class="page">
+<div class="container">
+<h2 style="color:var(--neon)">Music</h2>
+<div class="card">
+<p>
+Música criada por Queiroz utilizando IA como ferramenta.<br>
+Letra 100% autoral escrita pelo próprio artista.
+</p>
+<a href="https://youtu.be/DRONvplAHJM" target="_blank" style="color:var(--neon);font-weight:900">
+▶ OUVIR NO YOUTUBE
+</a>
+</div>
+</div>
+</section>
+
+<footer>© BrxQueiroz — Cybersecurity & Systems Engineering</footer>
+
+<script>
+// LOGIN
+function enter(){
+loginSound.play();
+ambient.volume=.15;
+ambient.play();
+
+const mask=document.createElement("img");
+mask.src="https://i.imgur.com/WcQxZ7K.png";
+mask.style.position="fixed";
+mask.style.bottom="0";
+mask.style.right="30px";
+mask.style.width="260px";
+mask.style.zIndex="9999";
+document.body.appendChild(mask);
+
+setTimeout(()=>{
+mask.remove();
+login.remove();
+},2200);
+}
+
+// NAV
+function go(id){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+click.play();
+}
+
+// CURSOR
+const cur=document.getElementById("cursor");
+addEventListener("mousemove",e=>{
+cur.style.left=e.clientX+"px";
+cur.style.top=e.clientY+"px";
+});
+
+// MATRIX
+const c=document.getElementById("matrix"),x=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+const letters="01",size=14,cols=c.width/size,drops=Array(cols).fill(1);
+setInterval(()=>{
+x.fillStyle="rgba(2,4,9,.08)";
+x.fillRect(0,0,c.width,c.height);
+x.fillStyle="#00f5d4";
+x.font=size+"px monospace";
+drops.forEach((y,i)=>{
+x.fillText(letters[Math.random()*2|0],i*size,y*size);
+if(y*size>c.height&&Math.random()>.98)drops[i]=0;
+drops[i]++;
+});
+},35);
+
+// TERMINAL
+const cmd=document.getElementById("cmd");
+const out=document.getElementById("out");
+function log(t){out.innerHTML+=`<p>> ${t}</p>`;out.scrollTop=out.scrollHeight}
+
+cmd.addEventListener("keydown",e=>{
+if(e.key==="Enter"){exec(cmd.value);cmd.value=""}
+});
+
+function exec(v){
+log(v);
+switch(v){
+case "help":log("ls • cat profile • open music • connect map • sudo access");break;
+case "open music":go("music");break;
+case "connect map":go("mapPage");break;
+case "sudo access":document.body.style.filter="contrast(1.2)";log("recruiter mode enabled");break;
+default:log("unknown command");
+}
+}
+
+// MAP
+const map=document.getElementById("map"),mx=map.getContext("2d");
+map.width=map.offsetWidth;map.height=map.offsetHeight;
+setInterval(()=>{
+mx.fillStyle="rgba(0,0,0,.25)";
+mx.fillRect(0,0,map.width,map.height);
+const xPos=Math.random()*map.width;
+const yPos=Math.random()*map.height;
+mx.beginPath();
+mx.arc(xPos,yPos,4,0,Math.PI*2);
+mx.fillStyle="#ff3b3b";
+mx.fill();
+},450);
+</script>
+
+</body>
+</html>
